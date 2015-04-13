@@ -1,18 +1,23 @@
-epconsumption <- read.table("household_power_consumption.txt", header = T, sep = ";",
-                            nrows = 69518, na.strings = "?")
+# Loading "dplyr" package
+library(dplyr)
 
-# Subsetting just the rows corresponding to 1/2/2007 and 2/2/2007
-epconsumption <- epconsumption[66637:69516, ]
+# Loading data into R
+epConsumption <- read.table("household_power_consumption.txt", header = T, sep = ";", nrows = 69518, na.strings = "?")
 
-# Converting Date and Time variables to their respective formats
-epconsumption$Time <- strptime(paste(epconsumption$Date, epconsumption$Time, sep=" "),
-                               "%d/%m/%Y %H:%M:%S")
-epconsumption$Date <- as.Date(epconsumption$Date, format = "%d/%m/%Y")
+# Subsetting to only data from the dates 2007-02-01 and 2007-02-02
+# Our Date variable is in format: dd/mm/yyyy, i.e., we are looking for the values 1/2/2007 and 2/2/2007
+epConsumption <- filter(epConsumption, Date %in% c("1/2/2007", "2/2/2007"))
+
+# Transforming our Date and Time variables
+epConsumption$Date <- as.Date(epConsumption$Date, format="%d/%m/%Y")
+	# epConsumption <- mutate(epConsumption, Date = as.Date(Date, format = "%d/%m/%Y"))
+
+epConsumption$Time <- strptime(paste(epConsumption$Date, epConsumption$Time), "%Y-%m-%d %H:%M:%S")
 
 # Plotting
+
 png("plot2.png")
 
-plot(epconsumption$Time, epconsumption$Global_active_power, type = "l",
-     ylab = "Global Active Power (kilowatts)", xlab = "")
+with(epConsumption, plot(Time, Global_active_power, type = "l", ylab = "Global Active Power (kilowatts)", xlab = ""))
 
 dev.off()
